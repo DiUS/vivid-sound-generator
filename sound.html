@@ -3,62 +3,96 @@
 <head>
 <script>
 
-// create web audio api context
-var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function gainedGeneartor(context) {
+  const oscillator = context.createOscillator();
+  oscillator.frequency.value = 0;
 
-var oscillator = audioCtx.createOscillator();
-oscillator.type = 'sine';
-oscillator.frequency.value = 0;
+  const gain = context.createGain();
+  gain.gain.value = 0;
 
-var gainNode = audioCtx.createGain();
-gainNode.gain.value = 0;
+  oscillator.connect(gain);
+  gain.connect(context.destination);
 
-oscillator.connect(gainNode);
-gainNode.connect(audioCtx.destination);
-oscillator.start();
+  return {
+    oscillator: oscillator,
+    gain: gain,
+  }
+}
 
 function piano(n) {
   return 440 * Math.pow(2, (n - 49) / 12);
 }
 
-// const frequencies = [528/8, 528/4, 528/2, 528];
-
-const n = {};
+const NOTE_TO_FREQ = {};
 for (let i = 1, l = 0; i <= 88; i++) {
   const freq = piano(i);
   const tone = Math.floor((i + 8) / 12);
   if (l % 2 > 0) {
-    n[String.fromCharCode(65 + Math.floor((l % 14) / 2)) + '#' + tone] = freq;
-    n[String.fromCharCode(65 + Math.floor((l + 2) % 14 / 2)) + 'b' + tone] = freq;
+    NOTE_TO_FREQ[String.fromCharCode(65 + Math.floor((l % 14) / 2)) + '#' + tone] = freq;
+    NOTE_TO_FREQ[String.fromCharCode(65 + Math.floor((l + 2) % 14 / 2)) + 'b' + tone] = freq;
   } else {
-    n[String.fromCharCode(65 + Math.floor((l % 14) / 2)) + tone] = freq;
+    NOTE_TO_FREQ[String.fromCharCode(65 + Math.floor((l % 14) / 2)) + tone] = freq;
   }
 
   if (l % 14 == 2 || l % 14 == 8) l += 2;
   else l += 1;
 }
 
-console.log(n);
+(function () {
 
-const frequencies = 'C4 Db4 Eb4 E4 F#4 G4 A4 Bb4 C5'
-  .split(/\s+/).map(x => n[x]);
+// create web audio api context
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+var go1 = gainedGeneartor(audioCtx);
+var go2 = gainedGeneartor(audioCtx);
+
+go1.gain.gain.value = 0.2;
+go2.gain.gain.value = 0.1;
+
+var terms = 5;
+var real = new Float32Array(terms);
+var imag = new Float32Array(terms);
+for (var j = 0; j < terms; j++) {
+  if (j % 2 === 0) {
+    imag[j] = 0;
+    real[j] = 0;
+  } else {
+    imag[j] = 2 * Math.random();
+    real[j] = 1 / (1 + j);
+  }
+}
+
+var wave = audioCtx.createPeriodicWave(real, imag);
+go1.oscillator.setPeriodicWave(wave);
+
+// go2.oscillator.type = 'square';
+// go1.oscillator.start();
+// go2.oscillator.start();
+
+// const frequencies = 'C4 Db4 Eb4 E4 F#4 G4 A4 Bb4 C5'
+const frequencies = 'C4 D4 E4 G4 A4 C5'
+// const frequencies = 'A1'
+  .split(/\s+/).map(x => NOTE_TO_FREQ[x]);
 console.log(frequencies);
+
 let freqi = 0;
 setInterval(function () {
-  freqi = Math.floor(Math.random() * frequencies.length)
-  oscillator.frequency.value = frequencies[freqi];
-  // freqi = (freqi + 1) % frequencies.length;
+  go1.oscillator.frequency.value = frequencies[Math.floor(freqi / 2)];
+  // go2.oscillator.frequency.value = frequencies[Math.floor(freqi / 2)];
+  freqi = (freqi + 1) % (frequencies.length * 2);
 }, 200);
 
 
-var asdf = false;
-function toggle() {
-  if (!asdf) gainNode.gain.value = 0.2;
-  if (asdf) gainNode.gain.value = 0;
-  asdf = !asdf;
-}
+// var asdf = false;
+// function toggle() {
+//   if (!asdf) gainNode.gain.value = 0.2;
+//   if (asdf) gainNode.gain.value = 0;
+//   asdf = !asdf;
+// }
 
-toggle();
+// // toggle();
+
+}());
 </script>
 </head>
 <body>
