@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>
+
+// create web audio api context
+var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+var oscillator = audioCtx.createOscillator();
+oscillator.type = 'sine';
+oscillator.frequency.value = 0;
+
+var gainNode = audioCtx.createGain();
+gainNode.gain.value = 0;
+
+oscillator.connect(gainNode);
+gainNode.connect(audioCtx.destination);
+oscillator.start();
+
+function piano(n) {
+  return 440 * Math.pow(2, (n - 49) / 12);
+}
+
+// const frequencies = [528/8, 528/4, 528/2, 528];
+
+const n = {};
+for (let i = 1, l = 0; i <= 88; i++) {
+  const freq = piano(i);
+  const tone = Math.floor((i + 8) / 12);
+  if (l % 2 > 0) {
+    n[String.fromCharCode(65 + Math.floor((l % 14) / 2)) + '#' + tone] = freq;
+    n[String.fromCharCode(65 + Math.floor((l + 2) % 14 / 2)) + 'b' + tone] = freq;
+  } else {
+    n[String.fromCharCode(65 + Math.floor((l % 14) / 2)) + tone] = freq;
+  }
+
+  if (l % 14 == 2 || l % 14 == 8) l += 2;
+  else l += 1;
+}
+
+console.log(n);
+
+const frequencies = 'C4 Db4 Eb4 E4 F#4 G4 A4 Bb4 C5'
+  .split(/\s+/).map(x => n[x]);
+console.log(frequencies);
+let freqi = 0;
+setInterval(function () {
+  freqi = Math.floor(Math.random() * frequencies.length)
+  oscillator.frequency.value = frequencies[freqi];
+  // freqi = (freqi + 1) % frequencies.length;
+}, 200);
+
+
+var asdf = false;
+function toggle() {
+  if (!asdf) gainNode.gain.value = 0.2;
+  if (asdf) gainNode.gain.value = 0;
+  asdf = !asdf;
+}
+
+toggle();
+</script>
+</head>
+<body>
+<button onclick="toggle()">On/off</button>
+</body>
+</html>
