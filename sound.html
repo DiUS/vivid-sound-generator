@@ -6,6 +6,7 @@
 function gainedGeneartor(context) {
   const oscillator = context.createOscillator();
   oscillator.frequency.value = 0;
+  oscillator.type = 'triangle';
 
   const gain = context.createGain();
   gain.gain.value = 0;
@@ -42,46 +43,38 @@ for (let i = 1, l = 0; i <= 88; i++) {
 
 // create web audio api context
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
 var go1 = gainedGeneartor(audioCtx);
-var go2 = gainedGeneartor(audioCtx);
 
-go1.gain.gain.value = 0.2;
-go2.gain.gain.value = 0.1;
+go1.gain.gain.value = 0.02;
 
-var terms = 5;
-var real = new Float32Array(terms);
-var imag = new Float32Array(terms);
-for (var j = 0; j < terms; j++) {
-  if (j % 2 === 0) {
-    imag[j] = 0;
-    real[j] = 0;
-  } else {
-    imag[j] = 2 * Math.random();
-    real[j] = 1 / (1 + j);
-  }
-}
+// var terms = 5;
+// var real = new Float32Array(terms);
+// var imag = new Float32Array(terms);
+// for (var j = 0; j < terms; j++) {
+//   if (j % 2 === 0) {
+//     imag[j] = 0;
+//     real[j] = 0;
+//   } else {
+//     imag[j] = 2 * Math.random();
+//     real[j] = 1 / (1 + j);
+//   }
+// }
 
-var wave = audioCtx.createPeriodicWave(real, imag);
-go1.oscillator.setPeriodicWave(wave);
+// var wave = audioCtx.createPeriodicWave(real, imag);
+// go1.oscillator.setPeriodicWave(wave);
 
-// go2.oscillator.type = 'square';
-// go1.oscillator.start();
-// go2.oscillator.start();
-
-// const frequencies = 'C4 Db4 Eb4 E4 F#4 G4 A4 Bb4 C5'
 const frequencies = 'C4 D4 E4 G4 A4 C5'
-// const frequencies = 'A1'
   .split(/\s+/).map(x => NOTE_TO_FREQ[x]);
 console.log(frequencies);
 
 let freqi = 0;
 setInterval(function () {
-  go1.oscillator.frequency.value = frequencies[Math.floor(freqi / 2)];
-  // go2.oscillator.frequency.value = frequencies[Math.floor(freqi / 2)];
-  freqi = (freqi + 1) % (frequencies.length * 2);
+  go1.oscillator.frequency.value = frequencies[freqi];
+  freqi = (freqi + 1) % (frequencies.length);
+
 }, 200);
 
+go1.oscillator.start();
 
 // var asdf = false;
 // function toggle() {
