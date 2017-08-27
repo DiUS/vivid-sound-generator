@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "NODE_ENV=development webpack-dev-server --hot --inline --config ./webpack.config.babel.js"
+    "dev": "NODE_ENV=development webpack-dev-server --hot --inline --config ./webpack.config.babel.js",
+    "build": "rimraf dist && webpack"
   },
   "author": "",
   "license": "ISC",

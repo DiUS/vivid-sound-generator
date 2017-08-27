@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const PROJECT_ROOT = path.join(__dirname);
-const OUTPUT_PATH = path.join(PROJECT_ROOT, 'dist/client');
+const OUTPUT_PATH = path.join(PROJECT_ROOT, 'dist');
 
 export default () => {
   return {
