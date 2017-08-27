@@ -4,11 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "NODE_ENV=development webpack-dev-server --hot --inline --config ./webpack.config.babel.js"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "web-audio-api": "^0.2.2"
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "html-webpack-plugin": "^2.30.1",
+    "webpack": "^3.5.5",
+    "webpack-dev-server": "^2.7.1"
   }
 }
