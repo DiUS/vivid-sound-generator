@@ -21,7 +21,7 @@ const all = [
 
 // Gains
 const gainNode = context.createGain();
-gainNode.gain.value = 0;
+gainNode.gain.value = 0;''
 
 // Network
 all.forEach(oscN => oscN.connect(gainNode));

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development webpack-dev-server --hot --inline --config ./webpack.config.babel.js",
-    "build": "rimraf dist && webpack"
+    "build": "rimraf dist && webpack",
+    "push": "scp -rp dist pi@192.168.1.160:/home/pi/projects/audio"
   },
   "author": "",
   "license": "ISC",

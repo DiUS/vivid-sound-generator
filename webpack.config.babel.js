@@ -12,7 +12,7 @@ export default () => {
     },
     output: {
       path: OUTPUT_PATH,
-      filename: '[name].[hash:8].js',
+      filename: '[name].js',
     },
     resolve: {
       extensions: ['.jsx', '.js', '.css'],
