@@ -14,18 +14,39 @@ function createOsc(freq) {
 
 // Oscillators
 const all = [
-  createOsc(noteToFreq('C4')),
-  createOsc(noteToFreq('E4')),
-  createOsc(noteToFreq('G4')),
+  createOsc(noteToFreq('D2')),
+  createOsc(noteToFreq('A3')),
+  // createOsc(noteToFreq('C#3')),
+  createOsc(noteToFreq('F#3')),
 ];
 
 // Gains
-const gainNode = context.createGain();
-gainNode.gain.value = 0;''
+const pulseGainNode = context.createGain();
+pulseGainNode.gain.value = 0;
+
+const ambientGainNode = context.createGain();
+ambientGainNode.gain.value = 0.2;
+
+// Convolver
+const convolverNode = context.createConvolver();
+const frameCount = context.sampleRate * 1.0;
+
+const convolverBuffer = context.createBuffer(2, frameCount, context.sampleRate);
+const channelData = [convolverBuffer.getChannelData(0), convolverBuffer.getChannelData(1)];
+for (var i = 0; i < frameCount; i++) {
+  channelData[0][i] = Math.random() * 2 - 1;
+  channelData[1][i] = Math.random() * 2 - 1;
+}
+convolverNode.buffer = convolverBuffer;
 
 // Network
-all.forEach(oscN => oscN.connect(gainNode));
-gainNode.connect(context.destination);
+all.forEach(oscN => {
+  oscN.connect(pulseGainNode);
+  oscN.connect(ambientGainNode);
+});
+ambientGainNode.connect(convolverNode);
+pulseGainNode.connect(context.destination);
+convolverNode.connect(context.destination);
 
 // Start
 all.forEach(oscN => oscN.start());
@@ -33,9 +54,6 @@ all.forEach(oscN => oscN.start());
 // const
 
 setInterval(() => {
-  // gainNode.gain.exponentialRampToValueAtTime(0.2, context.currentTime + 0.5);
-  // gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 1);
-  // gainNode.gain.setValueAtTime(0, context.currentTime + 1);
-  gainNode.gain.setTargetAtTime(0.2, context.currentTime, 0.001);
-  gainNode.gain.setTargetAtTime(0, context.currentTime + .01, 0.5);
+  pulseGainNode.gain.setTargetAtTime(0.2, context.currentTime, 0.001);
+  pulseGainNode.gain.setTargetAtTime(0, context.currentTime + .01, 0.5);
 }, 1500);
