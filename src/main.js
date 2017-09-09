@@ -28,9 +28,12 @@ pulseGainNode.gain.value = 0;
 const ambientGainNode = context.createGain();
 ambientGainNode.gain.value = 0;
 
+const volumeGainNode = context.createGain();
+volumeGainNode.gain.value = 2;
+
 // Convolver
 const convolverNode = context.createConvolver();
-const frameCount = context.sampleRate * 3;
+const frameCount = context.sampleRate * 2;
 
 const convolverBuffer = context.createBuffer(2, frameCount, context.sampleRate);
 const channelData = [convolverBuffer.getChannelData(0), convolverBuffer.getChannelData(1)];
@@ -45,15 +48,28 @@ for (var i = 0; i < frameCount; i++) {
 convolverNode.buffer = convolverBuffer;
 convolverNode.normalize = false;
 
+// Compressor
+const compressorNode = context.createDynamicsCompressor();
+compressorNode.threshold.value = -24;
+compressorNode.knee.value = 30;
+compressorNode.ratio.value = 12;
+compressorNode.attack.value = 0;
+compressorNode.release.value = 0.25;
+
 // Network
 all.forEach(oscN => {
   oscN.connect(pulseGainNode);
   oscN.connect(ambientGainNode);
 });
 ambientGainNode.connect(convolverNode);
-pulseGainNode.connect(context.destination);
 pulseGainNode.connect(convolverNode);
-convolverNode.connect(context.destination);
+pulseGainNode.connect(volumeGainNode);
+convolverNode.connect(volumeGainNode);
+
+// volumeGainNode.connect(context.destination);
+
+volumeGainNode.connect(compressorNode);
+compressorNode.connect(context.destination);
 
 // Start
 all.forEach(oscN => oscN.start());
@@ -62,7 +78,7 @@ all.forEach(oscN => oscN.start());
 
 const TIME_CONSTANT = 0.01;
 const DECAY_CONSTANT = 0.1;
-const DURATION = 0.01;
+const DURATION = 0.1;
 
 function playBeat() {
   pulseGainNode.gain.setTargetAtTime(.2, context.currentTime, TIME_CONSTANT);
