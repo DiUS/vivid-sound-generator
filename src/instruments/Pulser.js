@@ -20,7 +20,7 @@ export default class Pulse {
       createOsc(this.context, noteToFreq('F#3')),
     ];
 
-    this.maxGain = 1 / this.oscillators.length;
+    this.maxGain = 1 / (this.oscillators.length + 1);
     this.outputGain = this.context.createGain();
     this.outputGain.gain.value = 0;
     this.oscillators.forEach(o => {
@@ -29,8 +29,15 @@ export default class Pulse {
     });
   }
 
+  start(velocity = 1) {
+    this.outputGain.gain.setTargetAtTime(Math.min(1, velocity) * this.maxGain, this.context.currentTime, TIME_CONSTANT);
+  }
+
+  stop() {
+    this.outputGain.gain.setTargetAtTime(0, this.context.currentTime, DECAY_CONSTANT);
+  }
+
   play(velocity = 1) {
-    console.log(Math.min(1, velocity))
     this.outputGain.gain.setTargetAtTime(Math.min(1, velocity) * this.maxGain, this.context.currentTime, TIME_CONSTANT);
     this.outputGain.gain.setTargetAtTime(0, this.context.currentTime + DURATION, DECAY_CONSTANT);
   }
