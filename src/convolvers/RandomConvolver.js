@@ -19,7 +19,7 @@ export default function(context, _options = {}) {
   const convolverBuffer = context.createBuffer(2, frameCount, context.sampleRate);
   const channelData = [convolverBuffer.getChannelData(0), convolverBuffer.getChannelData(1)];
   const generator = new MersenneTwister(123);
-  
+
   let i;
   for (i = 0; i < frameCount; i++) {
     const envelope = options.envelopeFunction(i, frameCount);
