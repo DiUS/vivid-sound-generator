@@ -18,6 +18,7 @@ const all = [
   createOsc(noteToFreq('A3')),
   // createOsc(noteToFreq('C#3')),
   createOsc(noteToFreq('F#3')),
+  // createOsc(noteToFreq('D3')),
 ];
 
 // Gains
@@ -25,19 +26,24 @@ const pulseGainNode = context.createGain();
 pulseGainNode.gain.value = 0;
 
 const ambientGainNode = context.createGain();
-ambientGainNode.gain.value = 0.2;
+ambientGainNode.gain.value = 0;
 
 // Convolver
 const convolverNode = context.createConvolver();
-const frameCount = context.sampleRate * 1.0;
+const frameCount = context.sampleRate * 3;
 
 const convolverBuffer = context.createBuffer(2, frameCount, context.sampleRate);
 const channelData = [convolverBuffer.getChannelData(0), convolverBuffer.getChannelData(1)];
+
+const TARGET = .01;
+const LAMBDA = -Math.log(TARGET) / frameCount;
 for (var i = 0; i < frameCount; i++) {
-  channelData[0][i] = Math.random() * 2 - 1;
-  channelData[1][i] = Math.random() * 2 - 1;
+  var envelope = Math.exp(-LAMBDA * i);
+  channelData[0][i] = (Math.random() * 2 - 1) * envelope;
+  channelData[1][i] = (Math.random() * 2 - 1) * envelope;
 }
 convolverNode.buffer = convolverBuffer;
+convolverNode.normalize = false;
 
 // Network
 all.forEach(oscN => {
@@ -46,6 +52,7 @@ all.forEach(oscN => {
 });
 ambientGainNode.connect(convolverNode);
 pulseGainNode.connect(context.destination);
+pulseGainNode.connect(convolverNode);
 convolverNode.connect(context.destination);
 
 // Start
@@ -53,7 +60,14 @@ all.forEach(oscN => oscN.start());
 
 // const
 
-setInterval(() => {
-  pulseGainNode.gain.setTargetAtTime(0.2, context.currentTime, 0.001);
-  pulseGainNode.gain.setTargetAtTime(0, context.currentTime + .01, 0.5);
-}, 1500);
+const TIME_CONSTANT = 0.01;
+const DECAY_CONSTANT = 0.1;
+const DURATION = 0.01;
+
+function playBeat() {
+  pulseGainNode.gain.setTargetAtTime(.2, context.currentTime, TIME_CONSTANT);
+  pulseGainNode.gain.setTargetAtTime(0, context.currentTime + DURATION, DECAY_CONSTANT);
+}
+
+// playBeat();
+// setInterval(playBeat, 1500);
