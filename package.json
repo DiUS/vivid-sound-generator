@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development webpack-dev-server --hot --inline --config ./webpack.config.babel.js",
+    "start.server": "node ./src/osc/receiver.js",
+    "start.oscpulse": "node ./src/osc/periodicEmitter.js",
     "build": "rimraf dist && webpack",
     "push": "scp -rp dist pi@192.168.1.160:/home/pi/projects/audio"
   },
@@ -13,7 +15,8 @@
   "dependencies": {
     "mersenne-twister": "^1.1.0",
     "osc-emitter": "^1.0.4",
-    "osc-receiver": "^1.1.3"
+    "osc-receiver": "^1.1.3",
+    "ws": "^3.1.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

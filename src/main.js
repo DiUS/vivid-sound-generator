@@ -1,5 +1,5 @@
-import Pulser from './instruments/Pulser'
-import RandomConvolver from './convolvers/RandomConvolver'
+import Pulser from './instruments/Pulser';
+import RandomConvolver from './convolvers/RandomConvolver';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const context = new AudioContext();
@@ -15,5 +15,10 @@ convolver.connect(context.destination);
 // window.addEventListener('keyup', () => pulser.stop());
 // window.addEventListener('blur', () => pulser.stop());
 
-pulser.play();
-setInterval(() => pulser.play(), 1500);
+// pulser.play();
+// setInterval(() => pulser.play(), 1500);
+
+const ws = new WebSocket('ws://localhost:8080');
+ws.onmessage = function (msg) {
+  pulser.play();
+};

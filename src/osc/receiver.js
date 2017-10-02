@@ -1,24 +1,37 @@
-var OscReceiver = require('osc-receiver')
-  , receiver = new OscReceiver();
+'use strict';
 
-receiver.bind(9337);
+const OscReceiver = require('osc-receiver');
+const receiver = new OscReceiver();
+const WebSocket = require('ws');
 
-receiver.on('/foo', function(a, b, c) {
-  console.log('foo');
+const PORT = 8080;
+
+function doLog(type) {
+  const args = Array.prototype.slice.call(arguments, 1);
+  args.unshift('[OSC Receiver]');
+  console[type].apply(console, args);
+}
+
+const log = ['trace', 'debug', 'info', 'warn', 'error'].reduce(function (sum, value) {
+  sum[value] = doLog.bind(null, value);
+  return sum;
+}, {});
+
+const wsServer = new WebSocket.Server({ port: PORT });
+
+wsServer.on('listening', function () {
+  log.info('Server is now listening on port', PORT);
 });
 
-receiver.on('/bar', function(x, y) {
-  console.log('bar');
+let wsConnection;
+wsServer.on('connection', function (ws) {
+  wsConnection = ws;
 });
 
-// receiver.on('/GULLIVER_SENSOR_KINECT_ScreenToVirtualMap/center', function() {
-//   console.log(arguments);
-// });
-
-receiver.on('message', function() {
-  // handle all messages
-  var address = arguments[0];
-  var args = Array.prototype.slice.call(arguments, 1);
-  console.log(arguments)
+receiver.bind(8081);
+receiver.on('/pulse', function (bpm, volume) {
+  log.info(bpm + ',' + volume);
+  if (wsConnection) {
+    wsConnection.send(bpm + ',' + volume);
+  }
 });
-
