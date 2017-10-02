@@ -19,6 +19,19 @@ Uses the WebAudio API to generate ambient sound and chord pulses. Pulses trigger
 +-----------+                      +--------------+    \~~~~~~~~~~~~~~~/    +--------------+
 ```
 
+* **Pulse generator** - a device on the network which sends one OSC packet over UDP for each 
+recorded heart beat.
+* **OSC packet** - a UDP message which contains contains information about a heart beat. Each 
+message contains 2 pieces of information: heart rate and stroke volume.
+* **OSC Receiver** - a node.js process which listens for OSC packets.
+* **WebSocket Server** - a node.js process which handles WebSocket connections and sends OSC packet
+information to connected clients.
+* **WebSocket msg** - a WebSocket message which contains the information about the received OSC 
+packet.
+* **Web Broser** - the user's web browser (e.g. Google Chrome).
+* **WebAudio API** - generates ambient sound and plays a special sound whenever pulse data is
+received over WebSocket
+
 # Development
 
 ## 1. Clone the repo
